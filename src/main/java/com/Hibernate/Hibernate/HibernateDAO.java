@@ -5,13 +5,17 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+
 public class HibernateDAO {
     // Save a new Hibernate entity
     public void saveHibernate(Hibernate hibernate) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            session.persist(hibernate); // Save the entity to the database
+            session.persist(hibernate);  // Use persist() instead of save()
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
@@ -38,14 +42,20 @@ public class HibernateDAO {
         return hibernate;
     }
 
-    // Get all Hibernate entities from the database
-    @SuppressWarnings("unchecked")
+    // Get all Hibernate entities using CriteriaBuilder (JPA Criteria API)
     public List<Hibernate> getAllHibernate() {
         Transaction transaction = null;
         List<Hibernate> hibernateList = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            hibernateList = session.createQuery("from Hibernate").list(); // Fetch all entities
+            
+            // Using CriteriaBuilder for fetching all entities
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<Hibernate> query = builder.createQuery(Hibernate.class);
+            Root<Hibernate> root = query.from(Hibernate.class);
+            query.select(root);
+            
+            hibernateList = session.createQuery(query).getResultList();
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
@@ -61,7 +71,7 @@ public class HibernateDAO {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            session.update(hibernate); // Update the entity
+            session.merge(hibernate); // Use merge() instead of update()
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
@@ -71,15 +81,17 @@ public class HibernateDAO {
         }
     }
 
-    // Delete a Hibernate entity by ID
+    // Delete a Hibernate entity using createMutationQuery (for HQL Delete)
     public void deleteHibernate(Long id) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            Hibernate hibernate = session.get(Hibernate.class, id); // Fetch entity to delete
+            
+            Hibernate hibernate = session.get(Hibernate.class, id); // Fetch entity
             if (hibernate != null) {
-                session.delete(hibernate); // Delete the entity
+                session.remove(hibernate); // Use remove() instead of delete()
             }
+
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
