@@ -24,3 +24,6 @@ public class HibernateUtil {
         getSessionFactory().close();
     }
 }
+
+// You will use this HibernateUtil to open Hibernate sessions, start 
+// transactions, and commit or rollback transactions.
