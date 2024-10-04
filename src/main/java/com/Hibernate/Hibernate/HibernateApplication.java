@@ -17,9 +17,9 @@ public class HibernateApplication {
         session.beginTransaction();
 
         // Create and save an entity
-        YourEntityClass entity = new YourEntityClass();
+        Hibernate entity = new Hibernate();
         entity.setName("Example");
-        session.save(entity);
+        session.persist(entity);
 
         // Commit the transaction and close the session
         session.getTransaction().commit();
