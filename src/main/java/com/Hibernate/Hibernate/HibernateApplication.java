@@ -1,5 +1,6 @@
 package com.Hibernate.Hibernate;
 
+import java.util.List;
 import org.hibernate.Session;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,22 +12,45 @@ public class HibernateApplication {
 	// 	SpringApplication.run(HibernateApplication.class, args);
 	// }
 
+	// public static void main(String[] args) {
+    //     // Start a Hibernate session
+    //     Session session = HibernateUtil.getSessionFactory().openSession();
+    //     session.beginTransaction();
+
+    //     // Create and save an entity
+    //     Hibernate entity = new Hibernate();
+    //     entity.setName("Example");
+    //     session.persist(entity);
+
+    //     // Commit the transaction and close the session
+    //     session.getTransaction().commit();
+    //     session.close();
+
+    //     // Shut down Hibernate when done
+    //     HibernateUtil.shutdown();
+    // }
+
 	public static void main(String[] args) {
-        // Start a Hibernate session
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        session.beginTransaction();
+        HibernateDAO hibernateDAO = new HibernateDAO();
 
-        // Create and save an entity
-        Hibernate entity = new Hibernate();
-        entity.setName("Example");
-        session.persist(entity);
+        // Create and save a new Hibernate entity
+        Hibernate hibernateEntity = new Hibernate("Sample Name");
+        hibernateDAO.saveHibernate(hibernateEntity);
 
-        // Commit the transaction and close the session
-        session.getTransaction().commit();
-        session.close();
+        // Fetch and print the entity by ID
+        Hibernate retrievedEntity = hibernateDAO.getHibernateById(hibernateEntity.getId());
+        System.out.println("Retrieved Entity: " + retrievedEntity.getName());
 
-        // Shut down Hibernate when done
-        HibernateUtil.shutdown();
+        // Update the entity
+        retrievedEntity.setName("Updated Name");
+        hibernateDAO.updateHibernate(retrievedEntity);
+
+        // Fetch all entities and print them
+        List<Hibernate> allEntities = hibernateDAO.getAllHibernate();
+        allEntities.forEach(entity -> System.out.println(entity.getName()));
+
+        // Delete the entity by ID
+        hibernateDAO.deleteHibernate(retrievedEntity.getId());
     }
 
 }
